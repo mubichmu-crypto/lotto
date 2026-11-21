@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12051f">
+<title>로또 번호 뽑기 | 6/45</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:clamp(18px,4vw,34px);padding:32px 16px 40px;
+    font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,-apple-system,sans-serif;
+    color:#fff;text-align:center;overflow-x:hidden;
+    background:radial-gradient(120% 90% at 50% -10%,#4a1c6e 0%,#2a0b44 38%,#150622 68%,#0b0312 100%);
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+    background:radial-gradient(2px 2px at 12% 18%,#fff 50%,transparent 51%),
+               radial-gradient(1.6px 1.6px at 82% 12%,#fff 50%,transparent 51%),
+               radial-gradient(1.8px 1.8px at 68% 78%,#fff 50%,transparent 51%),
+               radial-gradient(1.4px 1.4px at 24% 88%,#fff 50%,transparent 51%),
+               radial-gradient(1.5px 1.5px at 92% 58%,#fff 50%,transparent 51%),
+               radial-gradient(1.4px 1.4px at 40% 34%,#fff 50%,transparent 51%);
+  }
+  header{position:relative;z-index:1}
+  h1{margin:0;font-size:clamp(24px,6.4vw,38px);letter-spacing:-.5px;font-weight:800;
+     background:linear-gradient(180deg,#fff 20%,#ffd9f4 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+     filter:drop-shadow(0 2px 14px rgba(255,120,220,.45))}
+  .sub{margin:8px 0 0;font-size:clamp(13px,3.4vw,15px);color:#d9c6ee;letter-spacing:-.2px}
+  .stage{position:relative;z-index:1;width:100%;max-width:560px}
+  .balls{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(8px,2.4vw,14px);
+    padding:clamp(16px,4vw,26px) clamp(10px,3vw,20px);
+    border-radius:26px;
+    background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 18px 46px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.18);
+    backdrop-filter:blur(6px)
+  }
+  .slot{
+    --c:#2b2438;
+    position:relative;width:clamp(56px,15vw,76px);height:clamp(56px,15vw,76px);border-radius:50%;
+    display:grid;place-items:center;font-weight:900;font-size:clamp(21px,5.6vw,29px);
+    color:#2a2130;background:var(--c);
+    box-shadow:inset -3px -5px 10px rgba(0,0,0,.22),inset 3px 4px 8px rgba(255,255,255,.55),0 8px 18px rgba(0,0,0,.4);
+    transform:scale(.55);opacity:.25;transition:none
+  }
+  .slot::after{
+    content:"";position:absolute;top:12%;left:16%;width:34%;height:26%;border-radius:50%;
+    background:radial-gradient(circle at 40% 40%,rgba(255,255,255,.95),rgba(255,255,255,0) 70%);
+    transform:rotate(-18deg);pointer-events:none
+  }
+  .slot.pop{animation:pop .5s cubic-bezier(.2,1.5,.4,1) forwards}
+  @keyframes pop{
+    0%{transform:scale(.4) translateY(14px);opacity:.2}
+    60%{transform:scale(1.12) translateY(-4px);opacity:1}
+    100%{transform:scale(1) translateY(0);opacity:1}
+  }
+  .c1{--c:linear-gradient(160deg,#ffe066,#f5b400)}
+  .c2{--c:linear-gradient(160deg,#7fd8ff,#2a9fe0)}
+  .c3{--c:linear-gradient(160deg,#ff9a9a,#e63946)}
+  .c4{--c:linear-gradient(160deg,#dcdcdc,#9aa0a6)}
+  .c5{--c:linear-gradient(160deg,#c9ef6a,#7cae17)}
+  .actions{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+  button{
+    appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:800;
+    font-size:clamp(16px,4.4vw,19px);letter-spacing:-.2px;color:#2b0a3d;
+    padding:clamp(14px,3.8vw,18px) clamp(30px,9vw,52px);border-radius:999px;
+    background:linear-gradient(180deg,#fff3b0,#ffc93c);
+    box-shadow:0 10px 0 #b97b00,0 16px 30px rgba(0,0,0,.4);
+    transition:transform .12s ease,box-shadow .12s ease,filter .2s ease;min-width:min(78vw,260px)
+  }
+  button:hover{filter:brightness(1.06)}
+  button:active{transform:translateY(6px);box-shadow:0 4px 0 #b97b00,0 8px 16px rgba(0,0,0,.4)}
+  button:disabled{opacity:.55;cursor:default;transform:none;box-shadow:0 10px 0 #b97b00}
+  .count{font-size:clamp(12px,3.2vw,13.5px);color:#bda8d6;margin:0}
+  .legend{position:relative;z-index:1;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;
+    font-size:11.5px;color:#b9a6d1;max-width:420px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+  @media (max-width:360px){.balls{gap:7px}}
+</style>
+</head>
+<body>
+  <header>
+    <h1>🎰 로또 번호 뽑기</h1>
+    <p class="sub">1부터 45까지, 행운의 숫자 6개</p>
+  </header>
+
+  <main class="stage">
+    <div class="balls" id="balls" aria-live="polite" aria-label="추첨된 번호">
+      <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
+      <div class="slot">?</div><div class="slot">?</div><div class="slot">?</div>
+    </div>
+  </main>
+
+  <div class="actions">
+    <button id="draw" type="button">번호 뽑기</button>
+    <p class="count" id="count">아직 뽑지 않았어요</p>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:#f5b400"></i>1–10</span>
+    <span><i style="background:#2a9fe0"></i>11–20</span>
+    <span><i style="background:#e63946"></i>21–30</span>
+    <span><i style="background:#9aa0a6"></i>31–40</span>
+    <span><i style="background:#7cae17"></i>41–45</span>
+  </div>
+
+<script>
+(function(){
+  var ballsEl = document.getElementById('balls');
+  var btn = document.getElementById('draw');
+  var countEl = document.getElementById('count');
+  var draws = 0;
+  var busy = false;
+  var timers = [];
+
+  function colorClass(n){
+    if(n<=10) return 'c1';
+    if(n<=20) return 'c2';
+    if(n<=30) return 'c3';
+    if(n<=40) return 'c4';
+    return 'c5';
+  }
+
+  function pick(){
+    var pool = [];
+    for(var i=1;i<=45;i++) pool.push(i);
+    var out = [];
+    for(var k=0;k<6;k++){
+      var idx = Math.floor(Math.random()*pool.length);
+      out.push(pool.splice(idx,1)[0]);
+    }
+    return out.sort(function(a,b){return a-b;});
+  }
+
+  function clearTimers(){
+    for(var i=0;i<timers.length;i++) clearTimeout(timers[i]);
+    timers = [];
+  }
+
+  function render(numbers){
+    var slots = ballsEl.querySelectorAll('.slot');
+    for(var i=0;i<slots.length;i++){
+      (function(el, n, i){
+        var t = setTimeout(function(){
+          el.className = 'slot ' + colorClass(n);
+          el.textContent = n;
+          void el.offsetWidth;
+          el.classList.add('pop');
+        }, i*110);
+        timers.push(t);
+      })(slots[i], numbers[i], i);
+    }
+    var done = setTimeout(function(){
+      busy = false;
+      btn.disabled = false;
+      draws++;
+      btn.textContent = '다시 뽑기';
+      countEl.textContent = draws + '번째 추첨 완료 · 오름차순 정렬';
+    }, 6*110 + 260);
+    timers.push(done);
+  }
+
+  btn.addEventListener('click', function(){
+    if(busy) return;
+    busy = true;
+    btn.disabled = true;
+    clearTimers();
+    var slots = ballsEl.querySelectorAll('.slot');
+    for(var i=0;i<slots.length;i++){
+      slots[i].className = 'slot';
+      slots[i].style.color = '';
+      slots[i].textContent = '·';
+    }
+    countEl.textContent = '번호를 뽑는 중…';
+    var numbers = pick();
+    var t = setTimeout(function(){ render(numbers); }, 260);
+    timers.push(t);
+  });
+})();
+</script>
+</body>
+</html>
